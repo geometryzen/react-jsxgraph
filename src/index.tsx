@@ -22,7 +22,7 @@ export interface JsxGraphStep {
    * This also depends on the elementType.
    * Common attributes are name, visible, strokeColor.
    */
-  attributes: Record<string, unknown>
+  attributes?: Record<string, unknown>
 }
 
 /**
@@ -70,13 +70,12 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
       this.board = void 0
     }
   }
-  render() {
+  render(): JSX.Element {
     try {
       if (this.board) {
         const elements: { [name: string]: JXG.GeometryElement } = {}
         for (const step of this.props.steps) {
           // TODO: Do we need a more generic create method on the JXG.Board?
-          /* eslint-disable @typescript-eslint/no-implicit-any */
           const element: JXG.GeometryElement = this.board.create(step.type as any, step.parents, step.attributes)
           elements[element.name] = element
         }
@@ -94,7 +93,7 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
  * @param parents Determine the location of the point.
  * @param attributes Determine the appearance of the point.
  */
-export function createPoint(parents: [x: number, y: number], attributes: JXG.PointAttributes): JsxGraphStep {
+export function createPoint(parents: [x: number, y: number], attributes?: JXG.PointAttributes): JsxGraphStep {
   const step: JsxGraphStep = {
     type: 'point',
     parents,
@@ -110,7 +109,7 @@ export function createPoint(parents: [x: number, y: number], attributes: JXG.Poi
  * @param parents Determine the location of the line.
  * @param attributes Determine the appearance of the line.
  */
-export function createLine(parents: [firstPointName: string, lastPointName: string], attributes: JXG.LineAttributes): JsxGraphStep {
+export function createLine(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.LineAttributes): JsxGraphStep {
   const step: JsxGraphStep = {
     type: 'line',
     parents,
@@ -126,7 +125,7 @@ export function createLine(parents: [firstPointName: string, lastPointName: stri
  * @param parents Determine the location of the line.
  * @param attributes Determine the appearance of the line.
  */
-export function createSegment(parents: [firstPointName: string, lastPointName: string], attributes: JXG.SegmentAttributes): JsxGraphStep {
+export function createSegment(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.SegmentAttributes): JsxGraphStep {
   const step: JsxGraphStep = {
     type: 'segment',
     parents,
@@ -137,7 +136,7 @@ export function createSegment(parents: [firstPointName: string, lastPointName: s
   return step
 }
 
-export function createGeometryElement(elementType: GeometryElementType, parents: unknown[], attributes: Record<string, unknown>): JsxGraphStep {
+export function createGeometryElement(elementType: GeometryElementType, parents: unknown[], attributes?: Record<string, unknown>): JsxGraphStep {
   const step: JsxGraphStep = {
     type: elementType,
     parents,
