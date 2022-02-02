@@ -1,6 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
-import { terser } from 'rollup-plugin-terser';
+// import { terser } from 'rollup-plugin-terser';
 import external from 'rollup-plugin-peer-deps-external';
 import dts from 'rollup-plugin-dts';
 
@@ -11,6 +11,15 @@ export default [
         input: 'src/index.tsx',
         output: [
             {
+                file: packageJson.browser,
+                format: 'umd',
+                sourcemap: true,
+                name: "reactJsxGraph",
+                globals: {
+                    'react': 'React'
+                }
+            },
+            {
                 file: packageJson.main,
                 format: 'esm',
                 sourcemap: true
@@ -20,7 +29,7 @@ export default [
             external(),
             resolve(),
             typescript({ tsconfig: './tsconfig.json' }),
-            terser()
+            // terser()
         ]
     },
     {
