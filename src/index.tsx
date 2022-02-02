@@ -35,6 +35,14 @@ interface JsxGraphProps {
    */
   id: string,
   /**
+   * The attributes used in the construction of the board.
+   */
+  attributes?: JXG.BoardAttributes;
+  /**
+   * 
+   */
+  className?: string;
+  /**
    * The steps in the construction.
    */
   steps: JsxGraphStep[]
@@ -56,13 +64,7 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
     this.state = {}
   }
   componentDidMount(): void {
-    this.board = JXG.JSXGraph.initBoard(this.props.id, {
-      axis: true,
-      boundingBox: [-6, 6, 6, -6],
-      showCopyright: false,
-      showNavigation: false,
-      showScreenshot: true
-    })
+    this.board = JXG.JSXGraph.initBoard(this.props.id, this.props.attributes)
   }
   componentWillUnmount(): void {
     if (this.board) {
@@ -75,7 +77,6 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
       if (this.board) {
         const elements: { [name: string]: JXG.GeometryElement } = {}
         for (const step of this.props.steps) {
-          // TODO: Do we need a more generic create method on the JXG.Board?
           const element: JXG.GeometryElement = this.board.create(step.type as any, step.parents, step.attributes)
           elements[element.name] = element
         }
@@ -84,8 +85,28 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
     } catch (e) {
       return <div><p>${e}</p></div>
     }
-    return <div id={`${this.props.id}`} className='jxgbox' style={{ width: 500 + 'px', height: 500 + 'px' }}></div>
+    return <div id={`${this.props.id}`} className={`${this.props.className}`} style={{ width: 500 + 'px', height: 500 + 'px' }}></div>
   }
+}
+
+/**
+ * Constructs a line.
+ * @param parents Determine the location of the line.
+ * @param attributes Determine the appearance of the line.
+ */
+export function circle(parents: unknown[], attributes?: JXG.CircleAttributes): JsxGraphStep {
+  const step: JsxGraphStep = { type: 'circle', parents, attributes }
+  return step
+}
+
+/**
+ * Constructs a line.
+ * @param parents Determine the location of the line.
+ * @param attributes Determine the appearance of the line.
+ */
+export function line(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.LineAttributes): JsxGraphStep {
+  const step: JsxGraphStep = { type: 'line', parents, attributes }
+  return step
 }
 
 /**
@@ -93,14 +114,8 @@ export class JsxGraph extends Component<JsxGraphProps, JsxGraphSpec> {
  * @param parents Determine the location of the point.
  * @param attributes Determine the appearance of the point.
  */
-export function createPoint(parents: [x: number, y: number], attributes?: JXG.PointAttributes): JsxGraphStep {
-  const step: JsxGraphStep = {
-    type: 'point',
-    parents,
-    // TODO: How to avoid having to do this?
-    // Is the problem with JXG.PointAttributes or Record<string,unkown>
-    attributes: attributes as Record<string, unknown>
-  }
+export function point(parents: [x: number, y: number], attributes?: JXG.PointAttributes): JsxGraphStep {
+  const step: JsxGraphStep = { type: 'point', parents, attributes }
   return step
 }
 
@@ -109,41 +124,19 @@ export function createPoint(parents: [x: number, y: number], attributes?: JXG.Po
  * @param parents Determine the location of the line.
  * @param attributes Determine the appearance of the line.
  */
-export function createLine(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.LineAttributes): JsxGraphStep {
-  const step: JsxGraphStep = {
-    type: 'line',
-    parents,
-    // TODO: How to avoid having to do this?
-    // Is the problem with JXG.PointAttributes or Record<string,unkown>
-    attributes: attributes as Record<string, unknown>
-  }
+export function segment(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.SegmentAttributes): JsxGraphStep {
+  const step: JsxGraphStep = { type: 'segment', parents, attributes }
   return step
 }
 
 /**
- * Constructs a line.
- * @param parents Determine the location of the line.
- * @param attributes Determine the appearance of the line.
+ * Creates a new geometric element of type elementType.
+ * @param elementType Type of the element to be constructed given as a string e.g. 'point' or 'circle'.
+ * @param parents Array of parent elements needed to construct the element e.g. coordinates for a point or two points to construct a line. This highly depends on the elementType that is constructed. See the corresponding JXG.create* methods for a list of possible parameters.
+ * @param attributes An object containing the attributes to be set. This also depends on the elementType. Common attributes are name, visible, strokeColor.
  */
-export function createSegment(parents: [firstPointName: string, lastPointName: string], attributes?: JXG.SegmentAttributes): JsxGraphStep {
-  const step: JsxGraphStep = {
-    type: 'segment',
-    parents,
-    // TODO: How to avoid having to do this?
-    // Is the problem with JXG.PointAttributes or Record<string,unkown>
-    attributes: attributes as Record<string, unknown>
-  }
-  return step
-}
-
-export function createGeometryElement(elementType: GeometryElementType, parents: unknown[], attributes?: Record<string, unknown>): JsxGraphStep {
-  const step: JsxGraphStep = {
-    type: elementType,
-    parents,
-    // TODO: How to avoid having to do this?
-    // Is the problem with JXG.PointAttributes or Record<string,unkown>
-    attributes: attributes as Record<string, unknown>
-  }
+export function element(elementType: GeometryElementType, parents: unknown[], attributes?: Record<string, unknown>): JsxGraphStep {
+  const step: JsxGraphStep = { type: elementType, parents, attributes }
   return step
 }
 

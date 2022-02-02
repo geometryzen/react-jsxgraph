@@ -553,7 +553,7 @@ declare module JXG {
     /**
      *
      */
-    export interface GeometryElementAttributes {
+    export interface GeometryElementAttributes extends Record<string, unknown> {
         /**
          * ???
          */
@@ -2812,7 +2812,7 @@ declare module JXG {
         setMatrix(board: Board, type: 'translate' | 'scale' | 'reflect' | 'rotate' | 'shear' | 'generic', params: unknown[], x: unknown, y: unknown, scale_x: unknown, scale_y: unknown): void;
         update(): this;
     }
-    export interface TransformationAttributes {
+    export interface TransformationAttributes extends Record<string, unknown> {
         type: 'generic' | 'rotate' | 'scale' | 'translate';
     }
 
