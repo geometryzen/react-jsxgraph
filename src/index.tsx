@@ -37,7 +37,7 @@ interface JsxGraphProps {
   /**
    * The attributes used in the construction of the board.
    */
-  attributes?: JXG.BoardAttributes;
+  attributes?: Partial<JXG.BoardAttributes>;
   /**
    * 
    */
